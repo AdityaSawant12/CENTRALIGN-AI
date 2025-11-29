@@ -15,11 +15,16 @@ export interface FormField {
     required: boolean;
     options?: string[]; // For select, radio, checkbox
     validation?: {
-        min?: number;
-        max?: number;
-        pattern?: string;
-        message?: string;
+        min?: number;           // Min value for number fields
+        max?: number;           // Max value for number fields
+        minLength?: number;     // Min length for text fields
+        maxLength?: number;     // Max length for text fields
+        pattern?: string;       // Regex pattern for validation
+        message?: string;       // Custom error message
     };
+    // File upload specific validations
+    accept?: string[];          // Accepted file types (e.g., ['.jpg', '.png', 'image/*'])
+    maxFileSize?: number;       // Max file size in bytes
 }
 
 export interface FormSchema {

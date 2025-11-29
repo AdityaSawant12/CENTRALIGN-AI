@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { getDatabase } from '../config/database.js';
 import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 import { Submission, Form } from '../models/types.js';
+import { validateFormSubmission } from '../services/validation.js';
 
 const router = Router();
 
@@ -28,18 +29,15 @@ router.post('/:shareableId', async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        // Validate responses against schema
-        const requiredFields = form.schema.fields
-            .filter((field) => field.required)
-            .map((field) => field.id);
+        // Validate responses against schema using comprehensive validation
+        const validationResult = validateFormSubmission(form.schema, responses);
 
-        for (const fieldId of requiredFields) {
-            if (!responses[fieldId] || responses[fieldId] === '') {
-                res.status(400).json({
-                    error: `Required field "${fieldId}" is missing`,
-                });
-                return;
-            }
+        if (!validationResult.isValid) {
+            res.status(400).json({
+                error: 'Validation failed',
+                validationErrors: validationResult.errors
+            });
+            return;
         }
 
         // Create submission

@@ -40,9 +40,13 @@ Return a JSON object with this EXACT structure (no markdown, no code blocks, jus
         "validation": {
           "min": 0,
           "max": 100,
+          "minLength": 2,
+          "maxLength": 100,
           "pattern": "regex pattern",
           "message": "Validation error message"
-        }
+        },
+        "accept": [".jpg", ".png", "image/*"],
+        "maxFileSize": 5242880
       }
     ]
   }
@@ -51,11 +55,17 @@ Return a JSON object with this EXACT structure (no markdown, no code blocks, jus
 Rules:
 1. Generate field IDs as lowercase with underscores (e.g., "full_name", "email_address")
 2. Use appropriate field types based on the data being collected
-3. Add validation rules where appropriate (email format, min/max for numbers, etc.)
-4. For image/file uploads, use type "image" or "file"
-5. Include 3-10 fields based on the request
-6. Make commonly required fields (name, email) required: true
-7. Return ONLY valid JSON, no additional text or markdown`;
+3. Add validation rules where appropriate:
+   - Email fields: Include email validation pattern
+   - Text fields: Add minLength (typically 2) and maxLength (50-200 based on field)
+   - Number fields: Add min/max values where logical
+   - File/Image fields: Add accept array with file types and maxFileSize in bytes
+4. For image uploads: use type "image", accept: [".jpg", ".jpeg", ".png", ".gif", ".webp"], maxFileSize: 5242880 (5MB)
+5. For document uploads: use type "file", accept: [".pdf", ".doc", ".docx"], maxFileSize: 10485760 (10MB)
+6. Include 3-10 fields based on the request
+7. Make commonly required fields (name, email) required: true
+8. Add sensible validation messages
+9. Return ONLY valid JSON, no additional text or markdown`;
 
     const result = await generationModel.generateContent(systemPrompt);
     const responseText = result.response.text();
